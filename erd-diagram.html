@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raagas Beach Resort — Database Schema ERD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #05111f;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ═══════════════════════════════════════════════
+           PAGE HEADER
+        ═══════════════════════════════════════════════ */
+        .page-header {
+            background: linear-gradient(135deg, #071830 0%, #0d2846 60%, #071830 100%);
+            border-bottom: 1px solid #1a3f6a;
+            padding: 22px 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .hdr-left {}
+
+        .hdr-title {
+            font-size: 21px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #38bdf8, #7dd3fc, #bae6fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .hdr-subtitle {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .hdr-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #1a3f6a;
+            border-radius: 10px;
+            padding: 10px 18px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .stat-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #38bdf8;
+            line-height: 1;
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            font-size: 9.5px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════
+           CANVAS AREA
+        ═══════════════════════════════════════════════ */
+        .canvas-scroll {
+            flex: 1;
+            overflow: auto;
+            background: #05111f;
+            background-image:
+                linear-gradient(rgba(56,189,248,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56,189,248,0.025) 1px, transparent 1px);
+            background-size: 32px 32px;
+            padding: 44px;
+        }
+
+        .erd-canvas {
+            position: relative;
+            width: 1280px;
+            height: 1040px;
+        }
+
+        /* SVG relationship lines */
+        .erd-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════
+           TABLE BOXES
+        ═══════════════════════════════════════════════ */
+        .erd-table {
+            position: absolute;
+            width: 284px;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 2;
+            box-shadow:
+                0 4px 24px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        .erd-table-header {
+            padding: 11px 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.25);
+        }
+
+        .tbl-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
+
+        .tbl-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .erd-table-body {}
+
+        /* Each column row — 3 columns: [badge] [name] [type] */
+        .erd-col {
+            display: grid;
+            grid-template-columns: 26px 1fr auto;
+            align-items: center;
+            height: 27px;
+            padding: 0 10px 0 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.035);
+            gap: 5px;
+            transition: background 0.12s;
+        }
+
+        .erd-col:last-child { border-bottom: none; }
+        .erd-col:hover { background: rgba(255,255,255,0.04) !important; }
+
+        /* Key badges */
+        .kb {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            padding: 2px 3px;
+            border-radius: 3px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kb-pk { background: rgba(251,191,36,0.14); color: #fbbf24; border: 1px solid rgba(251,191,36,0.28); }
+        .kb-fk { background: rgba(96,165,250,0.14); color: #60a5fa; border: 1px solid rgba(96,165,250,0.28); }
+        .kb-uk { background: rgba(167,139,250,0.14); color: #a78bfa; border: 1px solid rgba(167,139,250,0.28); }
+
+        /* Column name */
+        .col-n {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .col-n-default  { color: #94a3b8; }
+        .col-n-pk       { color: #fde68a; font-weight: 600; }
+        .col-n-fk       { color: #93c5fd; font-weight: 600; }
+        .col-n-nullable { color: #475569; }
+
+        /* Data type */
+        .col-t {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: #2d4a6b;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        /* Nullable tag */
+        .null-tag {
+            font-size: 8px;
+            color: #334155;
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 3px;
+            vertical-align: middle;
+        }
+
+        /* ═══════════════════════════════════════════════
+           TABLE COLOUR THEMES
+        ═══════════════════════════════════════════════ */
+
+        /* Roles — violet */
+        .t-roles  .erd-table-header { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+        .t-roles  .erd-table-body   { background: #120b2b; }
+
+        /* Users — ocean blue */
+        .t-users  .erd-table-header { background: linear-gradient(135deg, #0369a1, #0284c7); }
+        .t-users  .erd-table-body   { background: #061828; }
+
+        /* Sessions — emerald */
+        .t-sessions .erd-table-header { background: linear-gradient(135deg, #065f46, #047857); }
+        .t-sessions .erd-table-body   { background: #071812; }
+
+        /* Password reset — slate */
+        .t-pwd .erd-table-header { background: linear-gradient(135deg, #374151, #4b5563); }
+        .t-pwd .erd-table-body   { background: #0c0f14; }
+
+        /* Cottages — amber */
+        .t-cottages .erd-table-header { background: linear-gradient(135deg, #92400e, #b45309); }
+        .t-cottages .erd-table-body   { background: #180e04; }
+
+        /* Cottage children — orange */
+        .t-cottage-child .erd-table-header { background: linear-gradient(135deg, #9a3412, #c2410c); }
+        .t-cottage-child .erd-table-body   { background: #180a04; }
+
+        /* Bookings — rose */
+        .t-bookings .erd-table-header { background: linear-gradient(135deg, #9d174d, #be185d); }
+        .t-bookings .erd-table-body   { background: #18060f; }
+
+        /* Activity logs — cyan */
+        .t-activity .erd-table-header { background: linear-gradient(135deg, #0e7490, #0891b2); }
+        .t-activity .erd-table-body   { background: #071520; }
+
+        /* Payments — green */
+        .t-payments .erd-table-header { background: linear-gradient(135deg, #166534, #15803d); }
+        .t-payments .erd-table-body   { background: #071410; }
+
+        /* Advertisements — red */
+        .t-ads .erd-table-header { background: linear-gradient(135deg, #991b1b, #dc2626); }
+        .t-ads .erd-table-body   { background: #180606; }
+
+        /* ═══════════════════════════════════════════════
+           LEGEND
+        ═══════════════════════════════════════════════ */
+        .legend {
+            background: #071526;
+            border-top: 1px solid #1a3f6a;
+            padding: 13px 44px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .legend-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 8px;
+        }
+
+        .legend-sep { width: 1px; height: 20px; background: #1a3f6a; }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ──────────────────────────────────────────── -->
+<div class="page-header">
+    <div class="hdr-left">
+        <div class="hdr-title">🏖️ Raagas Beach Resort — Database Schema</div>
+        <div class="hdr-subtitle">Entity Relationship Diagram &nbsp;·&nbsp; Laravel 11 &nbsp;·&nbsp; SQLite</div>
+    </div>
+    <div class="hdr-right">
+        <div class="stat-card"><div class="stat-num">11</div><div class="stat-label">Tables</div></div>
+        <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">Relations</div></div>
+        <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Soft Deletes</div></div>
+    </div>
+</div>
+
+<!-- ─── Canvas ──────────────────────────────────────────── -->
+<div class="canvas-scroll">
+    <div class="erd-canvas" id="erd-canvas">
+        <svg class="erd-svg" id="erd-svg"></svg>
+        <!-- Tables injected by JS -->
+    </div>
+</div>
+
+<!-- ─── Legend ──────────────────────────────────────────── -->
+<div class="legend">
+    <span class="legend-title">Legend</span>
+    <div class="legend-sep"></div>
+    <div class="legend-item">
+        <span class="kb kb-pk">PK</span> Primary Key
+    </div>
+    <div class="legend-item">
+        <span class="kb kb-fk">FK</span> Foreign Key
+    </div>
+    <div class="legend-item">
+        <span class="kb kb-uk">UK</span> Unique Key
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-item">
+        <svg width="46" height="14" overflow="visible">
+            <circle cx="3" cy="7" r="3.5" fill="#38bdf8"/>
+            <line x1="6" y1="7" x2="36" y2="7" stroke="#38bdf8" stroke-width="1.8"/>
+            <polygon points="36,7 28,3.5 28,10.5" fill="#38bdf8"/>
+        </svg>
+        One-to-Many Relationship
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-item">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#334155;border:1px solid #1e3a5f;padding:1px 4px;border-radius:3px;">NULL</span>
+        Nullable Column
+    </div>
+    <div class="legend-item">
+        <span style="font-size:12px;">✦</span>
+        Soft Delete (deleted_at)
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-item" style="color:#334155;font-size:11px;">
+        Standalone tables (no FK links): password_reset_tokens &amp; advertisements
+    </div>
+</div>
+
+<script>
+/* ─── Data ────────────────────────────────────────────────── */
+const HEADER_H = 43;
+const ROW_H    = 27;
+const COL_W    = 284;
+
+const tables = [
+    {
+        id: 'roles', name: 'roles', icon: '🔑', theme: 't-roles',
+        x: 20, y: 20,
+        cols: [
+            { name: 'id',         type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'name',       type: 'VARCHAR(255)',     note: 'admin | staff | customer' },
+            { name: 'created_at', type: 'TIMESTAMP' },
+            { name: 'updated_at', type: 'TIMESTAMP' },
+        ]
+    },
+    {
+        id: 'users', name: 'users', icon: '👤', theme: 't-users',
+        x: 334, y: 20,
+        cols: [
+            { name: 'id',                type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'name',              type: 'VARCHAR(255)' },
+            { name: 'email',             type: 'VARCHAR(255)',    key: 'UK' },
+            { name: 'role_id',           type: 'BIGINT UNSIGNED', key: 'FK' },
+            { name: 'email_verified_at', type: 'TIMESTAMP',       nullable: true },
+            { name: 'password',          type: 'VARCHAR(255)' },
+            { name: 'remember_token',    type: 'VARCHAR(100)',    nullable: true },
+            { name: 'created_at',        type: 'TIMESTAMP' },
+            { name: 'updated_at',        type: 'TIMESTAMP' },
+        ]
+    },
+    {
+        id: 'sessions', name: 'sessions', icon: '🔒', theme: 't-sessions',
+        x: 658, y: 20,
+        cols: [
+            { name: 'id',            type: 'VARCHAR',     key: 'PK' },
+            { name: 'user_id',       type: 'BIGINT',      key: 'FK', nullable: true },
+            { name: 'ip_address',    type: 'VARCHAR(45)', nullable: true },
+            { name: 'user_agent',    type: 'TEXT',        nullable: true },
+            { name: 'payload',       type: 'LONGTEXT' },
+            { name: 'last_activity', type: 'INTEGER' },
+        ]
+    },
+    {
+        id: 'password_reset_tokens', name: 'password_reset_tokens', icon: '🔐', theme: 't-pwd',
+        x: 982, y: 20,
+        cols: [
+            { name: 'email',      type: 'VARCHAR(255)', key: 'PK', note: 'Standalone — no FK refs' },
+            { name: 'token',      type: 'VARCHAR(255)' },
+            { name: 'created_at', type: 'TIMESTAMP',   nullable: true },
+        ]
+    },
+
+    {
+        id: 'cottages', name: 'cottages', icon: '🏠', theme: 't-cottages',
+        x: 20, y: 210,
+        cols: [
+            { name: 'id',          type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'name',        type: 'VARCHAR(255)' },
+            { name: 'slug',        type: 'VARCHAR(255)',    key: 'UK' },
+            { name: 'description', type: 'TEXT',            nullable: true },
+            { name: 'capacity',    type: 'INTEGER' },
+            { name: 'price',       type: 'DECIMAL(10,2)' },
+            { name: 'status',      type: 'VARCHAR(255)',    note: 'available|reserved|maintenance|fully booked' },
+            { name: 'created_at',  type: 'TIMESTAMP' },
+            { name: 'updated_at',  type: 'TIMESTAMP' },
+            { name: 'deleted_at',  type: 'TIMESTAMP',      nullable: true, softDelete: true },
+        ]
+    },
+    {
+        id: 'cottage_images', name: 'cottage_images', icon: '🖼️', theme: 't-cottage-child',
+        x: 334, y: 368,
+        cols: [
+            { name: 'id',         type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'cottage_id', type: 'BIGINT UNSIGNED', key: 'FK' },
+            { name: 'image_path', type: 'VARCHAR(255)' },
+            { name: 'created_at', type: 'TIMESTAMP' },
+            { name: 'updated_at', type: 'TIMESTAMP' },
+            { name: 'deleted_at', type: 'TIMESTAMP',       nullable: true, softDelete: true },
+        ]
+    },
+    {
+        id: 'cottage_inclusions', name: 'cottage_inclusions', icon: '✅', theme: 't-cottage-child',
+        x: 334, y: 610,
+        cols: [
+            { name: 'id',             type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'cottage_id',     type: 'BIGINT UNSIGNED', key: 'FK' },
+            { name: 'inclusion_name', type: 'VARCHAR(255)' },
+            { name: 'created_at',     type: 'TIMESTAMP' },
+            { name: 'updated_at',     type: 'TIMESTAMP' },
+        ]
+    },
+
+    {
+        id: 'activity_logs', name: 'activity_logs', icon: '📋', theme: 't-activity',
+        x: 658, y: 262,
+        cols: [
+            { name: 'id',          type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'user_id',     type: 'BIGINT UNSIGNED', key: 'FK' },
+            { name: 'action',      type: 'VARCHAR(255)' },
+            { name: 'description', type: 'TEXT',            nullable: true },
+            { name: 'ip_address',  type: 'VARCHAR(255)',    nullable: true },
+            { name: 'created_at',  type: 'TIMESTAMP' },
+            { name: 'updated_at',  type: 'TIMESTAMP' },
+        ]
+    },
+    {
+        id: 'bookings', name: 'bookings', icon: '📅', theme: 't-bookings',
+        x: 658, y: 520,
+        cols: [
+            { name: 'id',               type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'reference_number', type: 'VARCHAR(255)',     key: 'UK' },
+            { name: 'customer_name',    type: 'VARCHAR(255)' },
+            { name: 'customer_email',   type: 'VARCHAR(255)' },
+            { name: 'customer_phone',   type: 'VARCHAR(255)' },
+            { name: 'cottage_id',       type: 'BIGINT UNSIGNED',  key: 'FK' },
+            { name: 'user_id',          type: 'BIGINT UNSIGNED',  key: 'FK', nullable: true },
+            { name: 'check_in',         type: 'DATE' },
+            { name: 'check_out',        type: 'DATE' },
+            { name: 'adults',           type: 'INTEGER',          note: 'default: 1' },
+            { name: 'children',         type: 'INTEGER',          note: 'default: 0' },
+            { name: 'total_price',      type: 'DECIMAL(10,2)' },
+            { name: 'status',           type: 'VARCHAR(255)',     note: 'pending|confirmed|checked-in|checked-out|cancelled' },
+            { name: 'created_at',       type: 'TIMESTAMP' },
+            { name: 'updated_at',       type: 'TIMESTAMP' },
+            { name: 'deleted_at',       type: 'TIMESTAMP',        nullable: true, softDelete: true },
+        ]
+    },
+
+    {
+        id: 'payments', name: 'payments', icon: '💳', theme: 't-payments',
+        x: 982, y: 188,
+        cols: [
+            { name: 'id',              type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'booking_id',      type: 'BIGINT UNSIGNED', key: 'FK' },
+            { name: 'amount',          type: 'DECIMAL(10,2)',   nullable: true },
+            { name: 'verified_amount', type: 'DECIMAL(10,2)',   nullable: true },
+            { name: 'payment_method',  type: 'VARCHAR(255)',    note: 'GCash | Maya | Bank Transfer | Cash' },
+            { name: 'proof_path',      type: 'VARCHAR(255)',    nullable: true },
+            { name: 'status',          type: 'VARCHAR(255)',    note: 'pending | verified | rejected' },
+            { name: 'created_at',      type: 'TIMESTAMP' },
+            { name: 'updated_at',      type: 'TIMESTAMP' },
+        ]
+    },
+    {
+        id: 'advertisements', name: 'advertisements', icon: '📢', theme: 't-ads',
+        x: 982, y: 560,
+        cols: [
+            { name: 'id',         type: 'BIGINT UNSIGNED', key: 'PK' },
+            { name: 'title',      type: 'VARCHAR(255)' },
+            { name: 'image_path', type: 'VARCHAR(255)' },
+            { name: 'link',       type: 'VARCHAR(255)',   nullable: true, note: 'Standalone — no FK refs' },
+            { name: 'is_active',  type: 'BOOLEAN',        note: 'default: true' },
+            { name: 'created_at', type: 'TIMESTAMP' },
+            { name: 'updated_at', type: 'TIMESTAMP' },
+        ]
+    },
+];
+
+const relationships = [
+    { from: 'roles',    fromCol: 'id', to: 'users',              toCol: 'role_id',    color: '#a78bfa' },
+    { from: 'users',    fromCol: 'id', to: 'sessions',           toCol: 'user_id',    color: '#34d399' },
+    { from: 'users',    fromCol: 'id', to: 'activity_logs',      toCol: 'user_id',    color: '#22d3ee' },
+    { from: 'users',    fromCol: 'id', to: 'bookings',           toCol: 'user_id',    color: '#f472b6' },
+    { from: 'cottages', fromCol: 'id', to: 'cottage_images',     toCol: 'cottage_id', color: '#fb923c' },
+    { from: 'cottages', fromCol: 'id', to: 'cottage_inclusions', toCol: 'cottage_id', color: '#fbbf24' },
+    { from: 'cottages', fromCol: 'id', to: 'bookings',           toCol: 'cottage_id', color: '#f87171' },
+    { from: 'bookings', fromCol: 'id', to: 'payments',           toCol: 'booking_id', color: '#4ade80' },
+];
+
+/* ─── Render tables ──────────────────────────────────────── */
+const canvas = document.getElementById('erd-canvas');
+
+tables.forEach(t => {
+    const wrap = document.createElement('div');
+    wrap.className = `erd-table ${t.theme}`;
+    wrap.id = `tbl-${t.id}`;
+    wrap.style.left = t.x + 'px';
+    wrap.style.top  = t.y + 'px';
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'erd-table-header';
+    hdr.innerHTML = `<span class="tbl-icon">${t.icon}</span><span class="tbl-name">${t.name}</span>`;
+    wrap.appendChild(hdr);
+
+    // Body rows
+    const body = document.createElement('div');
+    body.className = 'erd-table-body';
+
+    t.cols.forEach(col => {
+        const row = document.createElement('div');
+        row.className = 'erd-col';
+        row.id = `col-${t.id}-${col.name}`;
+        if (col.note) row.title = col.note;
+
+        // Badge
+        let badge = '';
+        if      (col.key === 'PK') badge = `<span class="kb kb-pk">PK</span>`;
+        else if (col.key === 'FK') badge = `<span class="kb kb-fk">FK</span>`;
+        else if (col.key === 'UK') badge = `<span class="kb kb-uk">UK</span>`;
+        else                       badge = `<span></span>`;
+
+        // Name styling
+        let nc = 'col-n';
+        if      (col.key === 'PK') nc += ' col-n-pk';
+        else if (col.key === 'FK') nc += ' col-n-fk';
+        else if (col.nullable)     nc += ' col-n-nullable';
+        else                       nc += ' col-n-default';
+
+        const nullTag   = col.nullable    ? `<span class="null-tag">NULL</span>` : '';
+        const softMark  = col.softDelete  ? `<span style="color:#334155;font-size:9px;margin-left:3px;">✦</span>` : '';
+
+        row.innerHTML = `${badge}<span class="${nc}">${col.name}${nullTag}${softMark}</span><span class="col-t">${col.type}</span>`;
+        body.appendChild(row);
+    });
+
+    wrap.appendChild(body);
+    canvas.appendChild(wrap);
+});
+
+/* ─── Draw SVG relationships ─────────────────────────────── */
+function colY(tableId, colName) {
+    const t = tables.find(x => x.id === tableId);
+    if (!t) return 0;
+    const idx = t.cols.findIndex(c => c.name === colName);
+    return t.y + HEADER_H + idx * ROW_H + ROW_H / 2;
+}
+
+function tableRight(tableId) { const t = tables.find(x => x.id === tableId); return t ? t.x + COL_W : 0; }
+function tableLeft(tableId)  { const t = tables.find(x => x.id === tableId); return t ? t.x : 0; }
+
+const svg = document.getElementById('erd-svg');
+
+// Arrow marker defs
+const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+relationships.forEach((rel, i) => {
+    const m = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    m.setAttribute('id', `arw-${i}`);
+    m.setAttribute('markerWidth', '7');
+    m.setAttribute('markerHeight', '7');
+    m.setAttribute('refX', '5.5');
+    m.setAttribute('refY', '3');
+    m.setAttribute('orient', 'auto');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    p.setAttribute('points', '0 0, 6 3, 0 6');
+    p.setAttribute('fill', rel.color);
+    m.appendChild(p);
+    defs.appendChild(m);
+});
+svg.appendChild(defs);
+
+relationships.forEach((rel, i) => {
+    const fromT = tables.find(t => t.id === rel.from);
+    const toT   = tables.find(t => t.id === rel.to);
+    if (!fromT || !toT) return;
+
+    const yFrom = colY(rel.from, rel.fromCol);
+    const yTo   = colY(rel.to,   rel.toCol);
+
+    let x1, y1, x2, y2, cp1x, cp1y, cp2x, cp2y;
+
+    if (toT.x >= fromT.x + COL_W - 2) {
+        // destination is to the right
+        x1 = tableRight(rel.from); y1 = yFrom;
+        x2 = tableLeft(rel.to);    y2 = yTo;
+        const dx = x2 - x1;
+        cp1x = x1 + dx * 0.42; cp1y = y1;
+        cp2x = x2 - dx * 0.42; cp2y = y2;
+    } else if (toT.x + COL_W <= fromT.x + 2) {
+        // destination is to the left
+        x1 = tableLeft(rel.from);  y1 = yFrom;
+        x2 = tableRight(rel.to);   y2 = yTo;
+        const dx = x1 - x2;
+        cp1x = x1 - dx * 0.42; cp1y = y1;
+        cp2x = x2 + dx * 0.42; cp2y = y2;
+    } else {
+        // same column band — loop around the right side
+        const loop = Math.max(tableRight(rel.from), tableRight(rel.to)) + 50;
+        x1 = tableRight(rel.from); y1 = yFrom;
+        x2 = tableRight(rel.to);   y2 = yTo;
+        cp1x = loop; cp1y = y1;
+        cp2x = loop; cp2y = y2;
+    }
+
+    // Cubic bezier path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`);
+    path.setAttribute('stroke', rel.color);
+    path.setAttribute('stroke-width', '1.8');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.72');
+    path.setAttribute('marker-end', `url(#arw-${i})`);
+    svg.appendChild(path);
+
+    // Source dot (the "one" end)
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', x1);
+    dot.setAttribute('cy', y1);
+    dot.setAttribute('r', '3.5');
+    dot.setAttribute('fill', rel.color);
+    dot.setAttribute('opacity', '0.9');
+    svg.appendChild(dot);
+});
+</script>
+</body>
+</html>
