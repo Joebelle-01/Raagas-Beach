@@ -1,7 +1,7 @@
 <x-admin-layout>
     <div class="mb-8 flex items-center justify-between">
         <div>
-            <h1 class="font-serif text-3xl font-bold text-slate-900">Staff Management</h1>
+            <h1 class="font-serif text-3xl font-bold text-slate-900">Users Management</h1>
             <p class="mt-1 text-slate-500">Manage administrative access and team roles.</p>
         </div>
         <a href="{{ route('admin.users.create') }}" class="flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-[0.98]">
