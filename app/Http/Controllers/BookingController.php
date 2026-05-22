@@ -96,7 +96,7 @@ class BookingController extends Controller
     public function payment(Request $request, $reference)
     {
         $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $booking = Booking::where('reference_number', $reference)->firstOrFail();
@@ -112,12 +112,13 @@ class BookingController extends Controller
             Payment::create([
                 'booking_id' => $booking->id,
                 'amount' => $booking->total_price,
+                'payment_method' => 'GCash/Bank Transfer', // Default fallback for guest proof uploads
                 'proof_path' => $path,
                 'status' => 'pending',
             ]);
 
             return redirect()->route('dashboard')
-                ->with('success', 'Payment proof uploaded successfully. We will verify it shortly.');
+                ->with('success', 'Done submitting receipt! We will review and verify your payment shortly.');
         }
 
         return back()->with('error', 'Failed to upload payment proof.');

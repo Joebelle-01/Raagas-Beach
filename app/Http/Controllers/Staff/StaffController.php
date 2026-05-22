@@ -30,7 +30,7 @@ class StaffController extends Controller
             ? round(($occupiedCount / $stats['total_cottages']) * 100) 
             : 0;
 
-        $recentBookings = Booking::with('cottage')->latest()->take(5)->get();
+        $recentBookings = Booking::with(['cottage', 'payments', 'payment'])->latest()->take(5)->get();
 
         return view('staff.dashboard', compact('stats', 'recentBookings'));
     }

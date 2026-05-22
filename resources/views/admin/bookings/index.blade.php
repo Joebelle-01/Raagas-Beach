@@ -33,6 +33,7 @@
                         <i class="fas fa-tag absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-amber-500 transition-colors"></i>
                         <select name="status" onchange="this.form.submit()" class="bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-600 focus:ring-2 focus:ring-amber-500/20 py-3 pl-11 pr-10 min-w-[200px] appearance-none cursor-pointer hover:bg-slate-100 transition-all">
                             <option value="">All Reservations</option>
+                            <option value="payment_pending" {{ request('status') == 'payment_pending' ? 'selected' : '' }}>💳 Receipt Submitted / Review Pending</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>🕒 Pending Verification</option>
                             <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>✨ Confirmed Stay</option>
                             <option value="checked_in" {{ request('status') == 'checked_in' ? 'selected' : '' }}>🏨 Currently In-House</option>
@@ -118,18 +119,65 @@
                                     $payment = $booking->payment;
                                     $paymentStatus = $payment ? $payment->status : 'none';
                                     $payConfig = [
-                                        'none' => ['color' => 'slate', 'icon' => 'fa-circle-xmark', 'label' => 'No Deposit'],
-                                        'pending' => ['color' => 'amber', 'icon' => 'fa-clock-rotate-left', 'label' => 'Pending Review'],
-                                        'verified' => ['color' => 'emerald', 'icon' => 'fa-circle-check', 'label' => 'Paid In Full'],
-                                        'rejected' => ['color' => 'rose', 'icon' => 'fa-circle-exclamation', 'label' => 'Payment Refused'],
-                                    ][$paymentStatus] ?? ['color' => 'slate', 'icon' => 'fa-circle', 'label' => $paymentStatus];
+                                        'none' => [
+                                            'bgClass' => 'bg-slate-50',
+                                            'textIconClass' => 'text-slate-500',
+                                            'textLabelClass' => 'text-slate-600',
+                                            'icon' => 'fa-circle-xmark',
+                                            'label' => 'No Deposit'
+                                        ],
+                                        'pending' => [
+                                            'bgClass' => 'bg-amber-50',
+                                            'textIconClass' => 'text-amber-500',
+                                            'textLabelClass' => 'text-amber-600',
+                                            'icon' => 'fa-clock-rotate-left',
+                                            'label' => 'Pending Review'
+                                        ],
+                                        'verified' => [
+                                            'bgClass' => 'bg-emerald-50',
+                                            'textIconClass' => 'text-emerald-500',
+                                            'textLabelClass' => 'text-emerald-600',
+                                            'icon' => 'fa-circle-check',
+                                            'label' => 'Paid In Full'
+                                        ],
+                                        'rejected' => [
+                                            'bgClass' => 'bg-rose-50',
+                                            'textIconClass' => 'text-rose-500',
+                                            'textLabelClass' => 'text-rose-600',
+                                            'icon' => 'fa-circle-exclamation',
+                                            'label' => 'Payment Refused'
+                                        ],
+                                    ][$paymentStatus] ?? [
+                                        'bgClass' => 'bg-slate-50',
+                                        'textIconClass' => 'text-slate-500',
+                                        'textLabelClass' => 'text-slate-600',
+                                        'icon' => 'fa-circle',
+                                        'label' => $paymentStatus
+                                    ];
                                 @endphp
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full bg-{{ $payConfig['color'] }}-50 flex items-center justify-center text-{{ $payConfig['color'] }}-500 text-xs">
-                                        <i class="fas {{ $payConfig['icon'] }}"></i>
-                                    </div>
+                                    @if($booking->payment && $booking->payment->proof_path)
+                                        <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox block relative group cursor-pointer" title="Verify Payment Proof for #{{ $booking->reference_number }}">
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 shadow-sm relative">
+                                                <img src="{{ Storage::url($booking->payment->proof_path) }}" alt="Receipt" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                                <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <i class="fas fa-eye text-white text-[10px]"></i>
+                                                </div>
+                                            </div>
+                                            @if($booking->payment->status === 'pending')
+                                                <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                                                </span>
+                                            @endif
+                                        </a>
+                                    @else
+                                        <div class="w-8 h-8 rounded-full {{ $payConfig['bgClass'] }} flex items-center justify-center {{ $payConfig['textIconClass'] }} text-xs">
+                                            <i class="fas {{ $payConfig['icon'] }}"></i>
+                                        </div>
+                                    @endif
                                     <div class="flex flex-col">
-                                        <span class="text-[11px] font-extrabold uppercase tracking-widest text-{{ $payConfig['color'] }}-600">
+                                        <span class="text-[11px] font-extrabold uppercase tracking-widest {{ $payConfig['textLabelClass'] }}">
                                             {{ $payConfig['label'] }}
                                         </span>
                                         <span class="text-[10px] text-slate-400 font-serif italic">₱ {{ number_format($booking->total_price, 2) }}</span>

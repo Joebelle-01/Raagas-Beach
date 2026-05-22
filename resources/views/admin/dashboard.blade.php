@@ -43,16 +43,16 @@
             <p class="text-2xl font-bold text-slate-800">{{ $stats['total_cottages'] > 0 ? round((($stats['total_cottages'] - $stats['available_cottages']) / $stats['total_cottages']) * 100) : 0 }}%</p>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <a href="{{ route('admin.bookings.index', ['status' => 'payment_pending']) }}" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 block hover:shadow-md transition-shadow group">
             <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-red-50 text-red-600 rounded-xl">
+                <div class="p-3 bg-red-50 text-red-600 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">Urgent</span>
+                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full group-hover:bg-red-100 transition-colors">Urgent</span>
             </div>
             <p class="text-slate-500 text-sm font-medium mb-1">Pending Payments</p>
             <p class="text-2xl font-bold text-slate-800">{{ $stats['pending_payments'] }}</p>
-        </div>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -96,6 +96,47 @@
                                     <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider {{ $statusClasses[$booking->status] ?? 'bg-slate-100' }}">
                                         {{ $booking->status }}
                                     </span>
+                                    @if($booking->payment)
+                                        <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                                            @if($booking->payment->status === 'pending')
+                                                @if($booking->payment->proof_path)
+                                                    <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-colors shadow-sm cursor-pointer animate-pulse" title="View Submitted Receipt for #{{ $booking->reference_number }}">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                        Receipt Submitted 👁️
+                                                    </a>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-100 shadow-sm">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                        Receipt Submitted
+                                                    </span>
+                                                @endif
+                                            @elseif($booking->payment->status === 'verified')
+                                                @if($booking->payment->proof_path)
+                                                    <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-colors shadow-sm cursor-pointer" title="View Verified Receipt for #{{ $booking->reference_number }}">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                        Verified 👁️
+                                                    </a>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                        Verified
+                                                    </span>
+                                                @endif
+                                            @elseif($booking->payment->status === 'rejected')
+                                                @if($booking->payment->proof_path)
+                                                    <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition-colors shadow-sm cursor-pointer" title="View Refused Receipt for #{{ $booking->reference_number }}">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                        Refused 👁️
+                                                    </a>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-100 shadow-sm">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                        Refused
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <a href="{{ route('admin.bookings.show', $booking) }}" class="p-2 hover:bg-slate-100 rounded-lg inline-block text-slate-400 hover:text-slate-800 transition-colors">

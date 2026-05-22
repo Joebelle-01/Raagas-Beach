@@ -16,11 +16,15 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $query = Booking::with(['cottage', 'payments'])->latest();
+        $query = Booking::with(['cottage', 'payments', 'payment'])->latest();
 
         if ($request->has('status') && $request->status != '') {
             if ($request->status === 'archived') {
                 $query = Booking::onlyTrashed()->with(['cottage', 'payments'])->latest();
+            } elseif ($request->status === 'payment_pending') {
+                $query->whereHas('payments', function ($q) {
+                    $q->where('status', 'pending');
+                });
             } else {
                 $query->where('status', $request->status);
             }
@@ -41,7 +45,7 @@ class BookingController extends Controller
 
     public function show($id)
     {
-        $booking = Booking::withTrashed()->with(['cottage', 'payments'])->findOrFail($id);
+        $booking = Booking::withTrashed()->with(['cottage', 'payments', 'payment'])->findOrFail($id);
         return view('admin.bookings.show', compact('booking'));
     }
 

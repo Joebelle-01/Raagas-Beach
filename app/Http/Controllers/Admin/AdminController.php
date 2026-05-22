@@ -22,7 +22,7 @@ class AdminController extends Controller
 
         // Only display active bookings (pending, confirmed, checked_in) on the dashboard.
         // Completed and cancelled bookings are archived and can be viewed in the view-all list.
-        $recentBookings = \App\Models\Booking::with('cottage')
+        $recentBookings = \App\Models\Booking::with(['cottage', 'payments', 'payment'])
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->latest()
             ->take(5)

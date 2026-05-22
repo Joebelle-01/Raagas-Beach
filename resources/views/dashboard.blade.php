@@ -38,6 +38,23 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="bg-rose-50 border border-rose-100 text-rose-800 px-6 py-5 rounded-2xl flex items-start gap-4 shadow-sm animate-fade-in-up">
+                    <span class="text-2xl mt-0.5">⚠️</span>
+                    <div>
+                        <p class="font-bold text-slate-800">Please correct the following errors:</p>
+                        <ul class="text-xs list-disc list-inside mt-1.5 space-y-1 text-rose-900 font-medium">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <p class="text-[10px] text-slate-400 mt-2 font-normal">
+                            * Note: If you selected a file but it says the field is required, the file may exceed PHP's server upload size limit. Try a smaller image or compressed file.
+                        </p>
+                    </div>
+                </div>
+            @endif
+
             <!-- Dynamic Greeting Banner -->
             @php
                 $hour = date('H');
@@ -219,7 +236,7 @@
                                                         <div class="space-y-2" id="upload_preview_container_{{ $booking->id }}">
                                                             <div class="text-3xl text-slate-300 group-hover:scale-110 transition-transform">📄</div>
                                                             <div class="text-xs font-bold text-slate-700">Click to upload transaction receipt</div>
-                                                            <div class="text-[10px] text-slate-400">JPEG, PNG, JPG (Max 2MB)</div>
+                                                            <div class="text-[10px] text-slate-400">JPEG, PNG, JPG, WEBP (Max 10MB)</div>
                                                         </div>
                                                         <div id="image_preview_box_{{ $booking->id }}" class="hidden">
                                                             <img id="image_preview_el_{{ $booking->id }}" src="" class="max-h-24 mx-auto object-contain rounded-lg border border-slate-100 shadow-sm">
