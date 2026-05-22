@@ -157,9 +157,9 @@
                                 @endphp
                                 <div class="flex items-center gap-2.5">
                                     @if($booking->payment && $booking->payment->proof_path)
-                                        <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox block relative group cursor-pointer" title="Verify Payment Proof for #{{ $booking->reference_number }}">
+                                        <a href="{{ $booking->payment->proof_url }}" class="glightbox block relative group cursor-pointer" title="Verify Payment Proof for #{{ $booking->reference_number }}">
                                             <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 shadow-sm relative">
-                                                <img src="{{ Storage::url($booking->payment->proof_path) }}" alt="Receipt" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                                <img src="{{ $booking->payment->proof_url }}" alt="Receipt" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                                 <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                                     <i class="fas fa-eye text-white text-[10px]"></i>
                                                 </div>

@@ -256,7 +256,7 @@
                                                         <span class="block text-[11px] text-amber-700/80 mt-1">Your proof of payment has been submitted and is currently being audited by resort concierge staff.</span>
                                                     </div>
                                                     @if($latestPayment && $latestPayment->proof_path)
-                                                        <a href="{{ Storage::url($latestPayment->proof_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-sea-900 hover:underline">
+                                                        <a href="{{ $latestPayment->proof_url }}" target="_blank" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-sea-900 hover:underline">
                                                             <span>View Submitted Proof</span>
                                                             <span>↗️</span>
                                                         </a>
@@ -273,7 +273,7 @@
                                             <span>Reserve status secured by Raagas Beach Resort administration.</span>
                                         </div>
                                         @if($booking->payments->count() > 0 && $latestPayment && $latestPayment->proof_path)
-                                            <a href="{{ Storage::url($latestPayment->proof_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sea-900 font-bold hover:underline">
+                                            <a href="{{ $latestPayment->proof_url }}" target="_blank" class="inline-flex items-center gap-1 text-sea-900 font-bold hover:underline">
                                                 <span>View Audited Receipt</span>
                                                 <span>↗️</span>
                                             </a>

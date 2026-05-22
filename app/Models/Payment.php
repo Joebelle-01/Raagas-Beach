@@ -12,4 +12,28 @@ class Payment extends Model
     {
         return $this->belongsTo(Booking::class);
     }
+
+    /**
+     * Get the URL for the payment proof, falling back to a custom placeholder receipt if the physical file does not exist.
+     */
+    public function getProofUrlAttribute()
+    {
+        if ($this->proof_path && \Storage::disk('public')->exists($this->proof_path)) {
+            return \Storage::url($this->proof_path);
+        }
+
+        return asset('assets/images/placeholder-receipt.png');
+    }
+
+    /**
+     * Check if the proof file is missing/mocked.
+     */
+    public function getIsMockProofAttribute()
+    {
+        if (!$this->proof_path) {
+            return true;
+        }
+
+        return !\Storage::disk('public')->exists($this->proof_path);
+    }
 }

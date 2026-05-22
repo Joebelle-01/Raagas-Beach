@@ -149,20 +149,28 @@
                                         </form>
                                     </div>
                                 @endif
-                            </div>
-
-                            <!-- Proof Image -->
-                            <div class="relative group">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Official Proof of Payment</p>
-                                <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox block relative rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 ring-8 ring-slate-50 group-hover:ring-amber-50 transition-all duration-500">
-                                    <img src="{{ Storage::url($booking->payment->proof_path) }}" alt="Payment Proof" class="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700">
-                                    <div class="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 flex items-center justify-center transition-all duration-500">
-                                        <div class="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl font-bold text-sm text-slate-900 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 flex items-center gap-2">
-                                            <i class="fas fa-search-plus text-xs"></i>
-                                            Inspect Document
-                                        </div>
+                                
+                                <!-- Proof Image -->
+                                <div class="relative group">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Official Proof of Payment</p>
+                                        @if($booking->payment->is_mock_proof)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                                                <i class="fas fa-triangle-exclamation"></i>
+                                                Demo Record: Missing Physical Image (Using Fallback)
+                                            </span>
+                                        @endif
                                     </div>
-                                </a>
+                                    <a href="{{ $booking->payment->proof_url }}" class="glightbox block relative rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 ring-8 ring-slate-50 group-hover:ring-amber-50 transition-all duration-500">
+                                        <img src="{{ $booking->payment->proof_url }}" alt="Payment Proof" class="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700">
+                                        <div class="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 flex items-center justify-center transition-all duration-500">
+                                            <div class="bg-white/90 backdrop-blur px-6 py-3 rounded-2xl font-bold text-sm text-slate-900 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 flex items-center gap-2">
+                                                <i class="fas fa-search-plus text-xs"></i>
+                                                Inspect Document
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @else

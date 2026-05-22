@@ -136,7 +136,7 @@
                                 <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
                                     @if($booking->payment->status === 'pending')
                                         @if($booking->payment->proof_path)
-                                            <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-colors shadow-sm cursor-pointer animate-pulse" title="View Submitted Receipt for #{{ $booking->reference_number }}">
+                                            <a href="{{ $booking->payment->proof_url }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-colors shadow-sm cursor-pointer animate-pulse" title="View Submitted Receipt for #{{ $booking->reference_number }}">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                                 Receipt Submitted 👁️
                                             </a>
@@ -148,7 +148,7 @@
                                         @endif
                                     @elseif($booking->payment->status === 'verified')
                                         @if($booking->payment->proof_path)
-                                            <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-colors shadow-sm cursor-pointer" title="View Verified Receipt for #{{ $booking->reference_number }}">
+                                            <a href="{{ $booking->payment->proof_url }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-colors shadow-sm cursor-pointer" title="View Verified Receipt for #{{ $booking->reference_number }}">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 Verified 👁️
                                             </a>
@@ -160,7 +160,7 @@
                                         @endif
                                     @elseif($booking->payment->status === 'rejected')
                                         @if($booking->payment->proof_path)
-                                            <a href="{{ Storage::url($booking->payment->proof_path) }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition-colors shadow-sm cursor-pointer" title="View Refused Receipt for #{{ $booking->reference_number }}">
+                                            <a href="{{ $booking->payment->proof_url }}" class="glightbox inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition-colors shadow-sm cursor-pointer" title="View Refused Receipt for #{{ $booking->reference_number }}">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 Refused 👁️
                                             </a>
