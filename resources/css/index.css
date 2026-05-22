@@ -1,0 +1,81 @@
+:root {
+    --resort-primary: #0ea5e9;
+    --resort-primary-dark: #0284c7;
+    --resort-secondary: #fef3c7;
+    --resort-accent: #f59e0b;
+    --resort-dark: #0f172a;
+    --resort-slate: #334155;
+    --resort-light: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+@layer base {
+    body {
+        @apply bg-sand-50 text-sea-900;
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    .btn-premium {
+        @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-xl;
+    }
+
+    .btn-primary-resort {
+        @apply btn-premium bg-sea-300 text-sea-900 hover:bg-sea-100 shadow-sea-300/30;
+    }
+
+    .btn-secondary-resort {
+        @apply btn-premium bg-white text-sea-900 hover:bg-sand-50 shadow-slate-200 border border-sea-100;
+    }
+
+    .glass-card {
+        @apply bg-white/70 backdrop-blur-lg border border-white/40 shadow-xl rounded-3xl;
+    }
+
+    .text-gradient {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-sea-300 to-sea-900;
+    }
+
+    .section-title {
+        @apply text-4xl md:text-5xl font-serif text-sea-900 leading-tight;
+    }
+
+    .section-subtitle {
+        @apply text-sea-300 font-bold uppercase tracking-widest text-sm mb-2 block;
+    }
+}
+
+/* Custom Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+
+/* Image Hover Effects */
+.hover-zoom {
+    @apply overflow-hidden;
+}
+
+.hover-zoom img {
+    @apply transition-transform duration-700;
+}
+
+.hover-zoom:hover img {
+    @apply scale-110;
+}
